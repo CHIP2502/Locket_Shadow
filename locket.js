@@ -12,19 +12,19 @@ var subscriptionData = {
   ownership_type: "PURCHASED",
   billing_issues_detected_at: null,
   period_type: "normal",
-  expires_date: "2099-01-01T00:00:00Z",
+  expires_date: "9999-09-09T00:00:00Z",
   grace_period_expires_date: null,
   unsubscribe_detected_at: null,
-  original_purchase_date: "2099-01-01T00:00:00Z",
-  purchase_date: "2099-01-01T00:00:00Z",
+  original_purchase_date: "9999-09-09T00:00:00Z",
+  purchase_date: "9999-09-09T00:00:00Z",
   store: "app_store"
 };
 
 var entitlementData = {
   grace_period_expires_date: null,
-  purchase_date: "2099-01-01T00:00:00Z",
+  purchase_date: "9999-09-09T00:00:00Z",
   product_identifier: "com.locket.Locket.premium.yearly",
-  expires_date: "2099-12-18T01:04:17Z"
+  expires_date: "9999-12-18T01:04:17Z"
 };
 
 const match = Object.keys(mapping).find(e => ua.includes(e));
