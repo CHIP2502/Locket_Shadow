@@ -4,12 +4,10 @@ const mapping = {
 };
 
 var ua = $request.headers["User-Agent"] || $request.headers["user-agent"];
-var body = $response.body;
-var obj = JSON.parse(body);
+var obj = JSON.parse($response.body);
 
-// 1. Cấu hình nội dung hiển thị (Bạn sửa chữ trong ngoặc kép theo ý muốn)
-const chu_hien_thi = "Zaara Dep Trai"; 
-const ngay_he_thong = "2024-09-09T00:00:00Z";
+// 1. CHỮ BẠN MUỐN HIỂN THỊ (Sửa ở đây)
+const CHU_CUSTOM = "Vĩnh Viễn Bởi Nobi"; 
 
 var subscriptionData = {
   is_sandbox: false,
@@ -19,20 +17,20 @@ var subscriptionData = {
   expires_date: "9999-09-09T00:00:00Z",
   grace_period_expires_date: null,
   unsubscribe_detected_at: null,
-  original_purchase_date: ngay_he_thong,
-  purchase_date: ngay_he_thong,
+  original_purchase_date: "2024-09-09T00:00:00Z",
+  purchase_date: "2024-09-09T00:00:00Z",
   store: "app_store"
 };
 
 var entitlementData = {
   grace_period_expires_date: null,
-  purchase_date: ngay_he_thong,
+  purchase_date: "2024-09-09T00:00:00Z",
   product_identifier: "com.locket.Locket.premium.yearly",
   expires_date: "9999-09-09T00:00:00Z"
 };
 
-// 2. Xử lý logic Premium
 const match = Object.keys(mapping).find(e => ua.includes(e));
+
 if (match) {
   let [e, s] = mapping[match];
   if (s) {
@@ -47,9 +45,18 @@ if (match) {
   obj.subscriber.entitlements.pro = entitlementData;
 }
 
-// 3. CHIÊU CUỐI: Ép ghi đè toàn bộ chuỗi ngày tháng thành chữ custom
-let finalBody = JSON.stringify(obj);
-finalBody = finalBody.replace(/9 thg 9, 9999/g, chu_hien_thi);
-finalBody = finalBody.replace(/September 9, 9999/g, chu_hien_thi);
+// 2. CHIÊU CUỐI: Chèn thêm các trường giả lập để ép App hiển thị text
+// Một số phiên bản RevenueCat sẽ ưu tiên đọc các trường định dạng sẵn này
+if (obj.subscriber.subscriptions) {
+    Object.keys(obj.subscriber.subscriptions).forEach(key => {
+        obj.subscriber.subscriptions[key].expires_date = CHU_CUSTOM;
+        obj.subscriber.subscriptions[key].purchase_date = CHU_CUSTOM;
+    });
+}
+if (obj.subscriber.entitlements) {
+    Object.keys(obj.subscriber.entitlements).forEach(key => {
+        obj.subscriber.entitlements[key].expires_date = CHU_CUSTOM;
+    });
+}
 
-$done({body: finalBody});
+$done({body: JSON.stringify(obj)});
