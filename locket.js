@@ -4,50 +4,52 @@ const mapping = {
 };
 
 var ua = $request.headers["User-Agent"] || $request.headers["user-agent"];
-var obj = JSON.parse($response.body);
+var body = $response.body;
+var obj = JSON.parse(body);
 
-// Thay đổi các giá trị chữ ở đây theo ý thích của bạn
-const chu_vinh_vien = "Zaara Dep Trai";
-const chu_ngay_mua = "Zaara Dep Trai";
-
-obj.Attention = "Gói cước đã được mở khóa!";
+// 1. Cấu hình nội dung hiển thị (Bạn sửa chữ trong ngoặc kép theo ý muốn)
+const chu_hien_thi = "Zaara Dep Trai"; 
+const ngay_he_thong = "2024-09-09T00:00:00Z";
 
 var subscriptionData = {
   is_sandbox: false,
   ownership_type: "PURCHASED",
   billing_issues_detected_at: null,
   period_type: "normal",
-  expires_date: chu_vinh_vien, // Chuyển thành chữ
+  expires_date: "9999-09-09T00:00:00Z",
   grace_period_expires_date: null,
   unsubscribe_detected_at: null,
-  original_purchase_date: chu_ngay_mua, // Chuyển thành chữ
-  purchase_date: chu_ngay_mua, // Chuyển thành chữ
+  original_purchase_date: ngay_he_thong,
+  purchase_date: ngay_he_thong,
   store: "app_store"
 };
 
 var entitlementData = {
   grace_period_expires_date: null,
-  purchase_date: chu_ngay_mua,
+  purchase_date: ngay_he_thong,
   product_identifier: "com.locket.Locket.premium.yearly",
-  expires_date: chu_vinh_vien
+  expires_date: "9999-09-09T00:00:00Z"
 };
 
+// 2. Xử lý logic Premium
 const match = Object.keys(mapping).find(e => ua.includes(e));
-
 if (match) {
   let [e, s] = mapping[match];
-  
   if (s) {
     entitlementData.product_identifier = s;
     obj.subscriber.subscriptions[s] = subscriptionData;
   } else {
     obj.subscriber.subscriptions["com.locket.Locket.premium.yearly"] = subscriptionData;
   }
-  
   obj.subscriber.entitlements[e] = entitlementData;
 } else {
   obj.subscriber.subscriptions["com.locket.Locket.premium.yearly"] = subscriptionData;
   obj.subscriber.entitlements.pro = entitlementData;
 }
 
-$done({body: JSON.stringify(obj)});
+// 3. CHIÊU CUỐI: Ép ghi đè toàn bộ chuỗi ngày tháng thành chữ custom
+let finalBody = JSON.stringify(obj);
+finalBody = finalBody.replace(/9 thg 9, 9999/g, chu_hien_thi);
+finalBody = finalBody.replace(/September 9, 9999/g, chu_hien_thi);
+
+$done({body: finalBody});
